@@ -149,9 +149,22 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 - **Backend**: Supabase (PostgreSQL, Auth, Real-time)
 - **Icons**: Lucide React
 - **Date Handling**: date-fns
+- **Charts**: Recharts
 - **PWA**: Service Worker, Web App Manifest
 
-## 📱 PWA Features
+## 🆕 New Features
+
+### XP & Streak System
+- **XP Points**: Earn 10 XP for each completed habit
+- **Streak Tracking**: Build streaks by completing habits consecutively
+- **Stats Dashboard**: View your total XP, max streaks, and progress
+
+### Analytics & Charts
+- **7-Day Trend Graph**: Visualize your habit completion over the last week
+- **Real-time Updates**: Charts update automatically as you log habits
+- **Completion Analytics**: Track your daily and weekly progress
+
+### PWA Features
 
 The app is fully PWA-compatible with:
 

@@ -28,6 +28,18 @@ export interface HabitLog {
   notes?: string
 }
 
+export interface Stats {
+  id: string
+  user_id: string
+  habit_id: string
+  xp: number
+  current_streak: number
+  max_streak: number
+  last_completed_date: string
+  created_at: string
+  updated_at: string
+}
+
 export interface User {
   id: string
   email: string

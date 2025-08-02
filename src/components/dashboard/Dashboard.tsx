@@ -2,18 +2,20 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { supabase, Habit, HabitLog, HABIT_CATEGORIES } from '@/lib/supabase'
+import { supabase, Habit, HabitLog, Stats, HABIT_CATEGORIES } from '@/lib/supabase'
 import { Plus, LogOut, Calendar, Target, Filter, BarChart3, Bell } from 'lucide-react'
 import HabitCard from './HabitCard'
 import AddHabitModal from './AddHabitModal'
 import HabitStats from './HabitStats'
 import HabitAnalytics from './HabitAnalytics'
 import ReminderSettings from './ReminderSettings'
+import Graph from './Graph'
 
 export default function Dashboard() {
   const { user, signOut } = useAuth()
   const [habits, setHabits] = useState<Habit[]>([])
   const [habitLogs, setHabitLogs] = useState<HabitLog[]>([])
+  const [stats, setStats] = useState<Stats[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddModal, setShowAddModal] = useState(false)
   const [showReminderSettings, setShowReminderSettings] = useState(false)
@@ -54,12 +56,27 @@ export default function Dashboard() {
     }
   }, [user?.id, selectedDate])
 
+  const fetchStats = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('stats')
+        .select('*')
+        .eq('user_id', user?.id)
+
+      if (error) throw error
+      setStats(data || [])
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+    }
+  }, [user?.id])
+
   useEffect(() => {
     if (user) {
       fetchHabits()
       fetchHabitLogs()
+      fetchStats()
     }
-  }, [user, fetchHabits, fetchHabitLogs])
+  }, [user, fetchHabits, fetchHabitLogs, fetchStats])
 
   const handleLogHabit = async (habitId: string, count: number, notes?: string) => {
     try {
@@ -77,6 +94,7 @@ export default function Dashboard() {
       
       // Refresh data
       fetchHabitLogs()
+      fetchStats()
     } catch (error) {
       console.error('Error logging habit:', error)
     }
@@ -161,7 +179,7 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Section */}
         <div className="mb-8">
-          <HabitStats habits={habits} habitLogs={habitLogs} />
+          <HabitStats habits={habits} habitLogs={habitLogs} stats={stats} />
         </div>
 
         {/* Tabs */}
@@ -254,18 +272,25 @@ export default function Dashboard() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredHabits.map((habit) => (
-                  <HabitCard
-                    key={habit.id}
-                    habit={habit}
-                    logs={habitLogs.filter(log => log.habit_id === habit.id)}
-                    onLog={handleLogHabit}
-                    onDelete={handleDeleteHabit}
-                    selectedDate={selectedDate}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  {filteredHabits.map((habit) => (
+                    <HabitCard
+                      key={habit.id}
+                      habit={habit}
+                      logs={habitLogs.filter(log => log.habit_id === habit.id)}
+                      onLog={handleLogHabit}
+                      onDelete={handleDeleteHabit}
+                      selectedDate={selectedDate}
+                    />
+                  ))}
+                </div>
+                
+                {/* Graph Component */}
+                <div className="mt-8">
+                  <Graph habits={habits} habitLogs={habitLogs} />
+                </div>
+              </>
             )}
           </>
         ) : (

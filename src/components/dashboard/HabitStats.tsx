@@ -1,15 +1,16 @@
 'use client'
 
-import { Habit, HabitLog } from '@/lib/supabase'
-import { Target, CheckCircle, Flame, BarChart3 } from 'lucide-react'
-import { subDays, isSameDay, startOfDay, endOfDay } from 'date-fns'
+import { Habit, HabitLog, Stats } from '@/lib/supabase'
+import { Target, CheckCircle, Flame, BarChart3, Zap } from 'lucide-react'
+import { subDays, startOfDay, endOfDay } from 'date-fns'
 
 interface HabitStatsProps {
   habits: Habit[]
   habitLogs: HabitLog[]
+  stats: Stats[]
 }
 
-export default function HabitStats({ habits, habitLogs }: HabitStatsProps) {
+export default function HabitStats({ habits, habitLogs, stats }: HabitStatsProps) {
   const totalHabits = habits.length
   const completedToday = habits.filter(habit => {
     const habitLogsForHabit = habitLogs.filter(log => log.habit_id === habit.id)
@@ -20,35 +21,13 @@ export default function HabitStats({ habits, habitLogs }: HabitStatsProps) {
 
   const completionRate = totalHabits > 0 ? Math.round((completedToday / totalHabits) * 100) : 0
 
-  // Calculate current streak for all habits
-  const calculateStreak = (habitId: string) => {
-    let streak = 0
-    let currentDate = new Date()
-    
-    while (true) {
-      const dayLogs = habitLogs.filter(log => {
-        const logDate = new Date(log.completed_at)
-        return log.habit_id === habitId && 
-               isSameDay(logDate, currentDate)
-      })
-      
-      const habit = habits.find(h => h.id === habitId)
-      if (!habit) break
-      
-      const totalCount = dayLogs.reduce((sum, log) => sum + log.count, 0)
-      
-      if (totalCount >= habit.target_count) {
-        streak++
-        currentDate = subDays(currentDate, 1)
-      } else {
-        break
-      }
-    }
-    
-    return streak
-  }
 
-  const maxStreak = habits.length > 0 ? Math.max(...habits.map(habit => calculateStreak(habit.id))) : 0
+
+  // Calculate total XP from stats
+  const totalXP = stats.reduce((sum, stat) => sum + stat.xp, 0)
+  
+  // Calculate max streak from stats
+  const maxStreak = stats.length > 0 ? Math.max(...stats.map(stat => stat.max_streak)) : 0
 
   // Calculate weekly progress
   const weekStart = startOfDay(subDays(new Date(), 6))
@@ -58,7 +37,7 @@ export default function HabitStats({ habits, habitLogs }: HabitStatsProps) {
     return logDate >= weekStart && logDate <= weekEnd
   })
 
-  const stats = [
+  const statsData = [
     {
       title: 'Total Habits',
       value: totalHabits,
@@ -74,7 +53,14 @@ export default function HabitStats({ habits, habitLogs }: HabitStatsProps) {
       bgColor: 'bg-green-50 dark:bg-green-900/20'
     },
     {
-      title: 'Current Streak',
+      title: 'Total XP',
+      value: totalXP,
+      icon: Zap,
+      color: 'text-yellow-600 dark:text-yellow-400',
+      bgColor: 'bg-yellow-50 dark:bg-yellow-900/20'
+    },
+    {
+      title: 'Max Streak',
       value: maxStreak,
       icon: Flame,
       color: 'text-orange-600 dark:text-orange-400',
@@ -93,7 +79,7 @@ export default function HabitStats({ habits, habitLogs }: HabitStatsProps) {
     <div className="space-y-6">
       {/* Main Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {stats.map((stat, index) => (
+        {statsData.map((stat, index) => (
           <div
             key={index}
             className={`${stat.bgColor} rounded-xl p-6 border border-gray-200 dark:border-gray-700`}
