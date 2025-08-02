@@ -228,3 +228,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Next.js](https://nextjs.org) for the React framework
 - [Tailwind CSS](https://tailwindcss.com) for the styling
 - [Lucide](https://lucide.dev) for the beautiful icons
+# Updated by Chandaka
