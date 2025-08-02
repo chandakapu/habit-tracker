@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Habit, HabitLog } from '@/lib/supabase'
 import { BarChart3, TrendingUp, Calendar, Target } from 'lucide-react'
 import { format, subDays, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay } from 'date-fns'
@@ -48,9 +48,9 @@ export default function HabitAnalytics({ habits, habitLogs }: HabitAnalyticsProp
     const habit = habits.find(h => h.id === habitId)
     if (!habit) return null
 
-    const habitLogs = habitLogs.filter(log => log.habit_id === habitId)
-    const totalLogs = habitLogs.length
-    const totalCount = habitLogs.reduce((sum, log) => sum + log.count, 0)
+    const filteredLogs = habitLogs.filter(log => log.habit_id === habitId)
+    const totalLogs = filteredLogs.length
+    const totalCount = filteredLogs.reduce((sum, log) => sum + log.count, 0)
     const avgPerDay = totalLogs > 0 ? Math.round(totalCount / totalLogs) : 0
 
     // Calculate streak
@@ -58,14 +58,14 @@ export default function HabitAnalytics({ habits, habitLogs }: HabitAnalyticsProp
     let currentDate = new Date()
     
     while (true) {
-      const dayLogs = habitLogs.filter(log => {
+      const dayLogs = filteredLogs.filter(log => {
         const logDate = new Date(log.completed_at)
         return isSameDay(logDate, currentDate)
       })
       
-      const totalCount = dayLogs.reduce((sum, log) => sum + log.count, 0)
+      const dayTotalCount = dayLogs.reduce((sum, log) => sum + log.count, 0)
       
-      if (totalCount >= habit.target_count) {
+      if (dayTotalCount >= habit.target_count) {
         streak++
         currentDate = subDays(currentDate, 1)
       } else {

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Habit } from '@/lib/supabase'
-import { Bell, Clock, Settings, X } from 'lucide-react'
+import { Bell, X } from 'lucide-react'
 
 interface ReminderSettingsProps {
   habits: Habit[]

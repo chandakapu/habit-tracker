@@ -1,8 +1,8 @@
 'use client'
 
 import { Habit, HabitLog } from '@/lib/supabase'
-import { Target, CheckCircle, TrendingUp, Calendar, Flame, BarChart3 } from 'lucide-react'
-import { format, subDays, isSameDay, startOfDay, endOfDay } from 'date-fns'
+import { Target, CheckCircle, Flame, BarChart3 } from 'lucide-react'
+import { subDays, isSameDay, startOfDay, endOfDay } from 'date-fns'
 
 interface HabitStatsProps {
   habits: Habit[]
@@ -17,7 +17,7 @@ export default function HabitStats({ habits, habitLogs }: HabitStatsProps) {
     return totalCount >= habit.target_count
   }).length
 
-  const totalLogsToday = habitLogs.length
+
   const completionRate = totalHabits > 0 ? Math.round((completedToday / totalHabits) * 100) : 0
 
   // Calculate current streak for all habits
@@ -119,7 +119,7 @@ export default function HabitStats({ habits, habitLogs }: HabitStatsProps) {
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Today's Progress
+            Today&apos;s Progress
           </h3>
           <span className="text-2xl font-bold text-gray-900 dark:text-white">
             {completionRate}%

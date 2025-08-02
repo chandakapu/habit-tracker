@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase, Habit, HabitLog, HABIT_CATEGORIES } from '@/lib/supabase'
 import { Plus, LogOut, Calendar, Target, Filter, BarChart3, Bell } from 'lucide-react'
@@ -21,14 +21,7 @@ export default function Dashboard() {
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [activeTab, setActiveTab] = useState<'habits' | 'analytics'>('habits')
 
-  useEffect(() => {
-    if (user) {
-      fetchHabits()
-      fetchHabitLogs()
-    }
-  }, [user, selectedDate])
-
-  const fetchHabits = async () => {
+  const fetchHabits = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('habits')
@@ -41,9 +34,9 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error fetching habits:', error)
     }
-  }
+  }, [user?.id])
 
-  const fetchHabitLogs = async () => {
+  const fetchHabitLogs = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('habit_logs')
@@ -59,7 +52,14 @@ export default function Dashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user?.id, selectedDate])
+
+  useEffect(() => {
+    if (user) {
+      fetchHabits()
+      fetchHabitLogs()
+    }
+  }, [user, fetchHabits, fetchHabitLogs])
 
   const handleLogHabit = async (habitId: string, count: number, notes?: string) => {
     try {
