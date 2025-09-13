@@ -53,7 +53,7 @@ A modern, feature-rich habit tracking application built with Next.js, Supabase, 
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/chandakapu/habit-tracker.git
 cd habit-tracker
 ```
 
